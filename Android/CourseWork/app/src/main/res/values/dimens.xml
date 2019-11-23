@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Basic-->
+    <dimen name="basic_tiny">8dp</dimen>
+    <dimen name="basic_small">12dp</dimen>
+    <dimen name="basic_medium">16dp</dimen>
+    <dimen name="basic_large">32dp</dimen>
+    <dimen name="basic_huge">64dp</dimen>
+    <!--Card-->
+    <dimen name="card_elevation">5dp</dimen>
+    <dimen name="card_radius">12dp</dimen>
+    <dimen name="card_padding">32dp</dimen>
+    <dimen name="card_title__text_size">18sp</dimen>
+</resources>
