@@ -1,0 +1,7 @@
+md5: 63bd9cb4bd78b725ec32c922f3c6144a
+outs:
+- md5: 4e5312e1e92930da8e4ba9e1b32510f6
+  path: label_descriptions.json
+  cache: true
+  metric: false
+  persist: false
