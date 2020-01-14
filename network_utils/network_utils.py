@@ -1,4 +1,5 @@
 import torch.nn as nn
+import torch.utils.data
 import torch
 
 class SpectralNorm(nn.Module):
@@ -53,3 +54,5 @@ class SpectralNorm(nn.Module):
     def forward(self, *args):
         self._update_u_v()
         return self.module.forward(*args)
+
+class 

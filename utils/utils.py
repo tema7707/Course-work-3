@@ -1,13 +1,15 @@
 import cv2
-import numpy as np
+import sys
+sys.path.append('..')
 
+import numpy as np
 from PIL import Image
 from scipy.io import loadmat
 from CONSTS import MASKPATH, IMAGEPATH
 
 def read_image(name):
     try:
-        img = Image.open(f'{IMAGEPATH}/{name}')
+        img = Image.open(f'{IMAGEPATH}/{name}').convert('RGB')
     except IOError:
         img = None
     return img

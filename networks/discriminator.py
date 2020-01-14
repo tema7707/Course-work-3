@@ -4,7 +4,7 @@ sys.path.append('..')
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-from utils.utils import SpectralNorm
+from network_utils.network_utils import SpectralNorm
 
 class NLayerDiscriminator(nn.Module):
     # change cur_dim 
