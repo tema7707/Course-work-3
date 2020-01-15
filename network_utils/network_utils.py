@@ -1,6 +1,7 @@
-import torch.nn as nn
 import torch.utils.data
 import torch
+
+import torch.nn as nn
 
 class SpectralNorm(nn.Module):
     def __init__(self, module, name='weight', power_iterations=1):
@@ -54,5 +55,3 @@ class SpectralNorm(nn.Module):
     def forward(self, *args):
         self._update_u_v()
         return self.module.forward(*args)
-
-class 

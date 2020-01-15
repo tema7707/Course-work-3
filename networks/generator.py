@@ -23,13 +23,15 @@ class DownsamplingBlock(nn.Module):
 
         super(DownsamplingBlock, self).__init__()
         self._name = 'downsampling_block'
+
+        self.in_channel, self.out_channel = in_channel, out_channel
         self.kernel_size = kernel_size
         self.stride = stride
         self.padding = padding
 
         self.downsampling_block = nn.Sequential(
-            nn.Conv2d(curr_dim, curr_dim*2, kernel_size=self.kernel_size, stride=self.stride, padding=self.padding, bias=False),
-            nn.InstanceNorm2d(curr_dim*2, affine=True),
+            nn.Conv2d(self.in_channel, self.out_channel, kernel_size=self.kernel_size, stride=self.stride, padding=self.padding, bias=False),
+            nn.InstanceNorm2d(self.out_channel, affine=True),
             nn.ReLU(inplace=True))
     
     def forward(self, x):
@@ -38,17 +40,20 @@ class DownsamplingBlock(nn.Module):
 
 class UpsamplingBlock(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size=3, stride=2, padding=1, output_padding=1):
+
         super(UpsamplingBlock, self).__init__()
         self._name = 'upsampling_block'
+
+        self.in_channel, self.out_channel = in_channel, out_channel
         self.kernel_size = kernel_size
         self.stride = stride
         self.padding = padding
         self.output_padding = output_padding
 
         self.upsampling_block = nn.Sequential(
-            nn.ConvTranspose2d(curr_dim, curr_dim//2, kernel_size=self.kernel_size, stride=self.stride, 
+            nn.ConvTranspose2d(self.in_channel, self.out_channel, kernel_size=self.kernel_size, stride=self.stride, 
                             padding=self.padding, output_padding=self.output_padding, bias=False),
-            nn.InstanceNorm2d(curr_dim//2, affine=True),
+            nn.InstanceNorm2d(self.out_channel, affine=True),
             nn.ReLU(inplace=True))
     
     def forward(self, x):
@@ -67,10 +72,10 @@ class ResNetGenerator_encoder(nn.Module):
 
         self.curr_dim = conv_dim
         for i in range(n_down):
-            layers.append(DownsamplingBlock(self.curr_dim, self.curr_dim*2, kernel_size=kernel_size, stride=2, padding=1, bias=False))
+            layers.append(DownsamplingBlock(self.curr_dim, self.curr_dim*2, kernel_size=kernel_size, stride=2, padding=1))
             self.curr_dim = self.curr_dim * 2
         for i in range(repeat_num):
-            layers.append(ResidualBlock(dim_in=self.curr_dim, dim_out=self.curr_dim))
+            layers.append(ResidualBlock(in_channel=self.curr_dim, out_channel=self.curr_dim))
 
         self.model = nn.Sequential(*layers)
 
@@ -85,18 +90,18 @@ class ResNetGenerator_encoder(nn.Module):
 
 class ResNetGenerator_decoder(nn.Module):
     def __init__(self, curr_dim=5, kernel_size=4, n_down=2):
-        super(ResNetGenerator_encoder, self).__init__()
+        super(ResNetGenerator_decoder, self).__init__()
         self._name = 'resnetgenerator_encoder'
         layers = []
 
         self.curr_dim = curr_dim
         for i in range(n_down):
-            layers.append(UpsamplingBlock(self.curr_dim, curr_dim*2, kernel_size=kernel_size, stride=2, padding=1, bias=False))
+            layers.append(UpsamplingBlock(self.curr_dim, curr_dim//2, kernel_size=kernel_size, stride=2, padding=1))
             self.curr_dim = self.curr_dim // 2
 
-        layers.append(nn.Conv2d(self.curr_dim, 3, kernel_size=3, stride=1, padding=1, bias=False))
-        layers.append(nn.Conv2d(self.curr_dim, 3, kernel_size=3, stride=1, padding=1, bias=False))
-        layers.append(nn.Tanh(inplace=True))
+        layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=3, stride=1, padding=1, bias=False))
+        layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=3, stride=1, padding=1, bias=False))
+        layers.append(nn.Tanh())
 
         self.model = nn.Sequential(*layers)
 
