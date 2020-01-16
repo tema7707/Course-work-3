@@ -61,3 +61,6 @@ class FashionDataset(torch.utils.data.Dataset):
             img, target = self.transforms(img, target)
 
         return img, target
+
+        def __len__(self):
+            return len(self.imgs)

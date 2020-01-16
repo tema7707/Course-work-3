@@ -65,11 +65,10 @@ class ResNetGenerator_encoder(nn.Module):
         super(ResNetGenerator_encoder, self).__init__()
         self._name = 'resnetgenerator_encoder'
         layers = []
-        layers.append(nn.Conv2d(c_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False))
-        layers.append(nn.Conv2d(c_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False))
+        layers.append(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False))
+        # layers.append(nn.Conv2d(conv_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False))
         layers.append(nn.InstanceNorm2d(conv_dim, affine=True))
         layers.append(nn.ReLU(inplace=True))
-
         self.curr_dim = conv_dim
         for i in range(n_down):
             layers.append(DownsamplingBlock(self.curr_dim, self.curr_dim*2, kernel_size=kernel_size, stride=2, padding=1))
@@ -96,11 +95,12 @@ class ResNetGenerator_decoder(nn.Module):
 
         self.curr_dim = curr_dim
         for i in range(n_down):
-            layers.append(UpsamplingBlock(self.curr_dim, curr_dim//2, kernel_size=kernel_size, stride=2, padding=1))
+            layers.append(UpsamplingBlock(self.curr_dim, self.curr_dim//2, kernel_size=kernel_size, stride=2, padding=1))
             self.curr_dim = self.curr_dim // 2
 
-        layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=3, stride=1, padding=1, bias=False))
-        layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=3, stride=1, padding=1, bias=False))
+        # layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=3, stride=1, padding=1, bias=False))
+        # layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=3, stride=1, padding=1, bias=False))
+        layers.append(nn.Conv2d(self.curr_dim, 1, kernel_size=7, stride=1, padding=3, bias=False))
         layers.append(nn.Tanh())
 
         self.model = nn.Sequential(*layers)
@@ -129,6 +129,7 @@ class ResNetGenerator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+        # return self.encoder(x)
 
 
 
