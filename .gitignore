@@ -65,3 +65,4 @@ fastlane/test_output
 fastlane/readme.md
 datasets/photos
 datasets/pixel_level
+datasets/mnist
