@@ -152,7 +152,6 @@ class ResNetGenerator(nn.Module):
 
 class ResNetUnetGenerator(nn.Module):
     def __init__(self, conv_dim=64, c_dim=5, repeat_num=9, kernel_size=3, n_down=2):
-        # todo: split parametrs for encoder and decoder 
         super(ResNetUnetGenerator, self).__init__()
         self._name = 'resnet_generator'
 
