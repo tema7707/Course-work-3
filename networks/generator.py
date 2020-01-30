@@ -64,7 +64,7 @@ class Encoder(nn.Module):
     def __init__(self, conv_dim=64, c_dim=5, kernel_size=4, n_down=2):
         super(Encoder, self).__init__()
         self._name = 'resnetgenerator_encoder'
-        layers = []
+        layers = nn.ModuleList()
         layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False),
                                     nn.InstanceNorm2d(conv_dim, affine=True),
                                     nn.ReLU(inplace=True)))
@@ -99,8 +99,8 @@ class Decoder(nn.Module):
     def __init__(self, curr_dim=5, kernel_size=4, n_down=2, skip_connection=False):
         super(Decoder, self).__init__()
         self._name = 'resnetgenerator_encoder'
-        self.layers = []
-        self.skip = []
+        self.layers = nn.ModuleList()
+        self.skip = nn.ModuleList()
 
         self.curr_dim = curr_dim
         for i in range(n_down):
@@ -118,7 +118,7 @@ class Decoder(nn.Module):
             self.curr_dim = self.curr_dim // 2
 
         self.layers.append(nn.Sequential(
-            nn.Conv2d(self.curr_dim, 3, kernel_size=7, stride=1, padding=3, bias=False),
+            nn.Conv2d(self.curr_dim, 1, kernel_size=7, stride=1, padding=3, bias=False),
             nn.Tanh()
         ))
 
@@ -179,6 +179,7 @@ class ResNetUnetGenerator(nn.Module):
             d_out = self.decoder.decoder[i](d_out)
             skip = e_result[self.n_down - i - 1]
             d_out = torch.cat([skip, d_out], dim=1)
+            # d_out = d_out.double()
             d_out = self.decoder.skip[i](d_out)
 
         return self.decoder.decoder[-1](d_out)
