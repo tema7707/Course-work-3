@@ -118,7 +118,7 @@ class Decoder(nn.Module):
             self.curr_dim = self.curr_dim // 2
 
         self.layers.append(nn.Sequential(
-            nn.Conv2d(self.curr_dim, 1, kernel_size=7, stride=1, padding=3, bias=False),
+            nn.Conv2d(self.curr_dim, 3, kernel_size=7, stride=1, padding=3, bias=False),
             nn.Tanh()
         ))
 
