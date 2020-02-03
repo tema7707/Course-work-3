@@ -118,7 +118,7 @@ class Decoder(nn.Module):
             self.curr_dim = self.curr_dim // 2
 
         self.layers.append(nn.Sequential(
-            nn.Conv2d(self.curr_dim, 1, kernel_size=7, stride=1, padding=3, bias=False),
+            nn.Conv2d(self.curr_dim, 3, kernel_size=7, stride=1, padding=3, bias=False),
             nn.Tanh()
         ))
 
@@ -143,12 +143,10 @@ class ResNetGenerator(nn.Module):
         self.curr_dim = self.encoder._get_curr_dim
         self.bottleneck = Bottleneck(c_dim=self.curr_dim, repeat_num=repeat_num)
         self.decoder = Decoder(curr_dim=self.curr_dim, kernel_size=kernel_size, n_down=n_down)
-        self.model = nn.Sequential(self.encoder, self.decoder) # , self.bottleneck, self.decoder
+        self.model = nn.Sequential(self.encoder, self.bottleneck, self.decoder)
 
     def forward(self, x):
         return self.model(x)
-        # return self.encoder(x)
-
 
 class ResNetUnetGenerator(nn.Module):
     def __init__(self, conv_dim=64, c_dim=5, repeat_num=9, kernel_size=3, n_down=2):
