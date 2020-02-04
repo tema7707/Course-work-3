@@ -3,22 +3,25 @@ import sys
 sys.path.append('..')
 
 import numpy as np
-import pycocotools.mask as mask_utils
+# import pycocotools.mask as mask_utils
 from PIL import Image
+import logging
 from scipy.io import loadmat
 from CONSTS import MASKPATH, IMAGEPATH
 
 def read_image(name):
     try:
         img = Image.open(f'{IMAGEPATH}/{name}').convert('RGB')
-    except IOError:
+    except IOError as ex:
+        logging.exception(str(ex))
         img = None
     return img
 
 def read_mask(name):
     try:
         mask_dic = loadmat(f'{MASKPATH}/{name}')
-    except FileNotFoundError:
+    except FileNotFoundError as ex:
+        logging.exception(str(ex))
         mask_dic = {}
     return mask_dic.get('groundtruth')
 
@@ -27,7 +30,32 @@ def cut_mask(image, mask, element):
     image_mask = cv2.bitwise_and(image, image, mask = cloth_mask)
     return image_mask
 
-def kaggle_to_rle_format(arr: List[int], height: int, width: int) -> List[int]:
+def load_specific_image(image_path, mask_path, objects=[31, 40]):
+    """
+    load specific object from dataset
+    """
+    return_info = {
+        'objects' : {},
+        'objects_count': {}
+    }
+    masks = os.listdir(MASKPATH)
+    for mask in tqdm(masks):
+        mask_array = read_mask(mask)
+        classes = np.unique(mask_array)
+        image_name = f'{mask.split(".")[0]}.jpg'
+        image_array = read_image(image_name)
+        for object_ in objects:
+            if object_ in classes:
+                if object_ not in return_info['objects_count']:
+                    return_info['objects_count'][object_] = 0
+                if object_ not in return_info['objects']:
+                    return_info['objects'][object_] = []
+                    
+                return_info['objects_count'][object_] += 1
+                return_info['objects'][object_].append(image_name.split('.')[0])
+    return return_info
+
+def kaggle_to_rle_format(arr, height, width):
     """Converts from Kaggle format to COCO RLE format.
 
     Args:
@@ -51,7 +79,7 @@ def kaggle_to_rle_format(arr: List[int], height: int, width: int) -> List[int]:
     correct[len(arr)] = height * width - curr
     return correct
 
-def rle_to_binary_format(rle: List[int], height: int, width: int) -> ndarray:
+def rle_to_binary_format(rle, height, width):
     """Converts from COCO RLE to binary mask.
 
     Args:
@@ -71,7 +99,7 @@ def rle_to_binary_format(rle: List[int], height: int, width: int) -> ndarray:
     mask = np.transpose(np.reshape(mask, (width, height)))
     return mask
 
-def kaggle_to_binary_format(arr: List[int], height: int, width: int) -> ndarray:
+def kaggle_to_binary_format(arr, height, width):
     """Converts from Kaggle format to binary mask.
 
     Args:
