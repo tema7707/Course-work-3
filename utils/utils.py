@@ -11,21 +11,40 @@ from CONSTS import MASKPATH, IMAGEPATH
 
 def read_image(name):
     try:
-        img = Image.open(f'{IMAGEPATH}/{name}').convert('RGB')
+        img = Image.open(f'{IMAGEPATH}/{name}.jpg').convert('RGB')
     except IOError as ex:
         logging.exception(str(ex))
         img = None
     return img
 
-def read_mask(name):
+def read_mask(name, objects=[]):
     try:
         mask_dic = loadmat(f'{MASKPATH}/{name}')
     except FileNotFoundError as ex:
         logging.exception(str(ex))
         mask_dic = {}
-    return mask_dic.get('groundtruth')
+    mask_numpy = mask_dic.get('groundtruth')
+    if (mask_numpy is not None):
+        mask_bool = np.isin(mask_numpy, objects) if objects else np.isin(mask_numpy, objects, invert=True)
+    else:
+        mask_numpy = np.array([])
+    # np.putmask(mask_numpy, ~mask_bool, 0)
+    return np.where(mask_bool, mask_numpy, 0)
+
+def specific_mask(mask, objects=[]):
+    return np.isin(mask, objects)
+
+def check_array(image):
+    try:
+        if not isinstance(image, np.ndarray):
+            return np.array(image)
+        else:
+            return image
+    except:
+        logging.exception("Can't convert to np.array")
 
 def cut_mask(image, mask, element):
+    image = check_array(image)
     cloth_mask = np.where(mask == element, mask, 0)
     image_mask = cv2.bitwise_and(image, image, mask = cloth_mask)
     return image_mask
