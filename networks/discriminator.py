@@ -34,7 +34,7 @@ class PatchDiscriminator(nn.Module):
             nn.LeakyReLU(0.2, True)
         ]
 
-        sequence += [nn.Conv2d(conv_dim * nf_mult, 1, kernel_size=17, stride=1, padding=padding)]
+        sequence += [nn.Conv2d(conv_dim * nf_mult, 1, kernel_size=3, stride=1, padding=padding)]
 
         if use_sigmoid:
             sequence += [nn.Sigmoid()]

@@ -2,10 +2,11 @@ import cv2
 import sys
 sys.path.append('..')
 
-import numpy as np
-# import pycocotools.mask as mask_utils
-from PIL import Image
+import os
 import logging
+import numpy as np
+from PIL import Image
+from tqdm import tqdm
 from scipy.io import loadmat
 from CONSTS import MASKPATH, IMAGEPATH
 
@@ -61,7 +62,7 @@ def load_specific_image(image_path, mask_path, objects=[31, 40]):
     for mask in tqdm(masks):
         mask_array = read_mask(mask)
         classes = np.unique(mask_array)
-        image_name = f'{mask.split(".")[0]}.jpg'
+        image_name = f'{mask.split(".")[0]}'
         image_array = read_image(image_name)
         for object_ in objects:
             if object_ in classes:
