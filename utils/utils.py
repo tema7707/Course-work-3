@@ -6,11 +6,34 @@ import os
 import logging
 import numpy as np
 from PIL import Image
+import torch
+from torch.utils.data import DataLoader
+from network_utils.network_utils import Fashion_swapper_dataset
+from torchvision.transforms import transforms
 from tqdm import tqdm
 from scipy.io import loadmat
 from CONSTS import MASKPATH, IMAGEPATH
 
+
+def createswapper_loader(image_path, mask_path, object_one=31, object_two=40, new_size=(300,200)):
+    '''
+    return two loader
+    - for object_one in CCP dataset
+    - for object_two in CCP dataset
+    '''
+    trans = transforms.Compose([transforms.Resize(new_size, 2), transforms.ToTensor()])
+    first_object = load_specific_image(IMAGEPATH, MASKPATH, objects=[object_one, object_two])
+    
+    dataset_one = Fashion_swapper_dataset(first_object, object_one, transform=trans)
+    dataset_second = Fashion_swapper_dataset(first_object, object_two, transform=trans)
+    loader_one = DataLoader(dataset_one, batch_size=8, shuffle=True, drop_last=True)
+    loader_second = DataLoader(dataset_second, batch_size=8, shuffle=True, drop_last=True)
+    return loader_one, loader_second
+
 def read_image(name):
+    '''
+    name - name of image without format
+    '''
     try:
         img = Image.open(f'{IMAGEPATH}/{name}.jpg').convert('RGB')
     except IOError as ex:
@@ -19,6 +42,10 @@ def read_image(name):
     return img
 
 def read_mask(name, objects=[]):
+    '''
+    name - name of image without format
+    objects - index of fashion wear in CCP dataset
+    '''
     try:
         mask_dic = loadmat(f'{MASKPATH}/{name}')
     except FileNotFoundError as ex:
@@ -49,6 +76,12 @@ def cut_mask(image, mask, element):
     cloth_mask = np.where(mask == element, mask, 0)
     image_mask = cv2.bitwise_and(image, image, mask = cloth_mask)
     return image_mask
+
+def add_mask(image, mask, axis=0):
+    '''
+    add mask to image
+    '''
+    return torch.tensor(np.concatenate((image, mask), axis=axis))
 
 def load_specific_image(image_path, mask_path, objects=[31, 40]):
     """

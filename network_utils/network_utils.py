@@ -3,6 +3,8 @@ import torch
 
 import torch.nn as nn
 
+from torch.utils.data import Dataset
+
 
 class SpectralNorm(nn.Module):
     def __init__(self, module, name='weight', power_iterations=1):
@@ -59,3 +61,24 @@ class SpectralNorm(nn.Module):
     def forward(self, *args):
         self._update_u_v()
         return self.module.forward(*args)
+
+class Fashion_swapper_dataset(Dataset):
+    
+    def __init__(self, loader, obj=31, transform=None):
+        self.objects = obj
+        self.transform = transform
+        self.loader = loader
+        
+    def __getitem__(self, idx):
+        first_name = self.loader['objects'][self.objects][idx]
+        first_image = read_image(first_name)
+        
+        first_mask = read_mask(first_name, self.objects)
+        first_mask = Image.fromarray(first_mask)
+        first_image = self.transform(first_image)
+        first_mask = self.transform(first_mask)
+        imagewithmask = add_mask(first_image, first_mask, 0)
+        return imagewithmask
+    
+    def __len__(self):
+        return self.loader['objects_count'][self.objects]

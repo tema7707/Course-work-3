@@ -69,7 +69,7 @@ class Encoder(nn.Module):
                                     nn.InstanceNorm2d(conv_dim, affine=True),
                                     nn.ReLU(inplace=True)))
         self.curr_dim = conv_dim
-        for i in range(n_down):
+        for _ in range(n_down):
             layers.append(DownsamplingBlock(self.curr_dim, self.curr_dim*2, kernel_size=kernel_size, stride=2, padding=1))
             self.curr_dim = self.curr_dim * 2
 
@@ -87,7 +87,7 @@ class Bottleneck(nn.Module):
     def __init__(self, c_dim=256, repeat_num=9):
         super(Bottleneck, self).__init__()
         self.layers = []
-        for i in range(repeat_num):
+        for _ in range(repeat_num):
             self.layers.append(ResidualBlock(in_channel=c_dim, out_channel=c_dim))
         self.bottleneck = nn.Sequential(*self.layers)
     
@@ -103,7 +103,7 @@ class Decoder(nn.Module):
         self.skip = nn.ModuleList()
 
         self.curr_dim = curr_dim
-        for i in range(n_down):
+        for _ in range(n_down):
             self.layers.append(nn.Sequential(
                 UpsamplingBlock(self.curr_dim, self.curr_dim//2, kernel_size=kernel_size, stride=2, padding=1),
                 nn.InstanceNorm2d(self.curr_dim//2, affine=True),

@@ -43,5 +43,3 @@ class PatchDiscriminator(nn.Module):
     def forward(self, input):
         return self.model(input)
 
-
-
