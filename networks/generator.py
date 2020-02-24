@@ -65,7 +65,16 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self._name = 'resnetgenerator_encoder'
         layers = nn.ModuleList()
-        layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False),
+        # layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False),
+        #                             nn.InstanceNorm2d(conv_dim, affine=True),
+        #                             nn.ReLU(inplace=True)))
+        layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
+                                    nn.InstanceNorm2d(conv_dim//2, affine=True),
+                                    nn.ReLU(inplace=True)))
+        layers.append(nn.Sequential(nn.Conv2d(conv_dim//2, conv_dim, kernel_size=3, stride=1, padding=1, bias=False),
+                                    nn.InstanceNorm2d(conv_dim, affine=True),
+                                    nn.ReLU(inplace=True)))
+        layers.append(nn.Sequential(nn.Conv2d(conv_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False),
                                     nn.InstanceNorm2d(conv_dim, affine=True),
                                     nn.ReLU(inplace=True)))
         self.curr_dim = conv_dim
@@ -118,7 +127,11 @@ class Decoder(nn.Module):
             self.curr_dim = self.curr_dim // 2
 
         self.layers.append(nn.Sequential(
-            nn.Conv2d(self.curr_dim, 4, kernel_size=7, stride=1, padding=3, bias=False),
+            nn.Conv2d(self.curr_dim, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.InstanceNorm2d(self.curr_dim//2, affine=True),
+            nn.Conv2d(self.curr_dim//2, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.InstanceNorm2d(self.curr_dim//2, affine=True),
+            nn.Conv2d(self.curr_dim//2, 1, kernel_size=3, stride=1, padding=1, bias=False),
             nn.Tanh()
         ))
 
@@ -163,11 +176,11 @@ class ResNetUnetGenerator(nn.Module):
 
     def forward(self, x):
         
-        e_out = self.encoder.encoder[0](x)
+        e_out = self.encoder.encoder[:3](x)
 
         e_result = [e_out]
 
-        for i in range(1, self.n_down + 1):
+        for i in range(3, self.n_down+3):
             e_out = self.encoder.encoder[i](e_out)
             e_result.append(e_out)
         
@@ -177,7 +190,5 @@ class ResNetUnetGenerator(nn.Module):
             d_out = self.decoder.decoder[i](d_out)
             skip = e_result[self.n_down - i - 1]
             d_out = torch.cat([skip, d_out], dim=1)
-            # d_out = d_out.double()
             d_out = self.decoder.skip[i](d_out)
-
         return self.decoder.decoder[-1](d_out)
