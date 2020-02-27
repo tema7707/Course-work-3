@@ -10,7 +10,7 @@ class ResidualBlock(nn.Module):
         self.res_block = nn.Sequential(
             nn.Conv2d(in_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False),
             nn.InstanceNorm2d(out_channel, affine=True),
-            nn.ReLU(inplace=True),
+            nn.LeakyReLU(0.2, inplace=True),
             nn.Conv2d(out_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False),
             nn.InstanceNorm2d(out_channel, affine=True))
 
@@ -32,7 +32,7 @@ class DownsamplingBlock(nn.Module):
         self.downsampling_block = nn.Sequential(
             nn.Conv2d(self.in_channel, self.out_channel, kernel_size=self.kernel_size, stride=self.stride, padding=self.padding, bias=False),
             nn.InstanceNorm2d(self.out_channel, affine=True),
-            nn.ReLU(inplace=True))
+            nn.LeakyReLU(0.2, inplace=True))
     
     def forward(self, x):
         return self.downsampling_block(x)
@@ -54,7 +54,7 @@ class UpsamplingBlock(nn.Module):
             nn.ConvTranspose2d(self.in_channel, self.out_channel, kernel_size=self.kernel_size, stride=self.stride, 
                             padding=self.padding, output_padding=self.output_padding, bias=False),
             nn.InstanceNorm2d(self.out_channel, affine=True),
-            nn.ReLU(inplace=True))
+            nn.LeakyReLU(0.2, inplace=True))
     
     def forward(self, x):
         return self.upsampling_block(x)
@@ -67,16 +67,16 @@ class Encoder(nn.Module):
         layers = nn.ModuleList()
         # layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False),
         #                             nn.InstanceNorm2d(conv_dim, affine=True),
-        #                             nn.ReLU(inplace=True)))
+        #                             nn.LeakyReLU(0.2, inplace=True)))
         layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
                                     nn.InstanceNorm2d(conv_dim//2, affine=True),
-                                    nn.ReLU(inplace=True)))
+                                    nn.LeakyReLU(0.2, inplace=True)))
         layers.append(nn.Sequential(nn.Conv2d(conv_dim//2, conv_dim, kernel_size=3, stride=1, padding=1, bias=False),
                                     nn.InstanceNorm2d(conv_dim, affine=True),
-                                    nn.ReLU(inplace=True)))
+                                    nn.LeakyReLU(0.2, inplace=True)))
         layers.append(nn.Sequential(nn.Conv2d(conv_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False),
                                     nn.InstanceNorm2d(conv_dim, affine=True),
-                                    nn.ReLU(inplace=True)))
+                                    nn.LeakyReLU(0.2, inplace=True)))
         self.curr_dim = conv_dim
         for _ in range(n_down):
             layers.append(DownsamplingBlock(self.curr_dim, self.curr_dim*2, kernel_size=kernel_size, stride=2, padding=1))
@@ -116,13 +116,13 @@ class Decoder(nn.Module):
             self.layers.append(nn.Sequential(
                 UpsamplingBlock(self.curr_dim, self.curr_dim//2, kernel_size=kernel_size, stride=2, padding=1),
                 nn.InstanceNorm2d(self.curr_dim//2, affine=True),
-                nn.ReLU(inplace=True)
+                nn.LeakyReLU(0.2, inplace=True)
             ))
             if skip_connection:
                 self.skip.append(nn.Sequential(
                     nn.Conv2d(self.curr_dim, self.curr_dim//2, kernel_size=kernel_size, stride=1, padding=1, bias=False),
                     nn.InstanceNorm2d(self.curr_dim//2, affine=True),
-                    nn.ReLU(inplace=True)
+                    nn.LeakyReLU(0.2, inplace=True)
                 ))
             self.curr_dim = self.curr_dim // 2
 
@@ -131,7 +131,7 @@ class Decoder(nn.Module):
             nn.InstanceNorm2d(self.curr_dim//2, affine=True),
             nn.Conv2d(self.curr_dim//2, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
             nn.InstanceNorm2d(self.curr_dim//2, affine=True),
-            nn.Conv2d(self.curr_dim//2, 1, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(self.curr_dim//2, 4, kernel_size=3, stride=1, padding=1, bias=False),
             nn.Tanh()
         ))
 
@@ -177,9 +177,7 @@ class ResNetUnetGenerator(nn.Module):
     def forward(self, x):
         
         e_out = self.encoder.encoder[:3](x)
-
         e_result = [e_out]
-
         for i in range(3, self.n_down+3):
             e_out = self.encoder.encoder[i](e_out)
             e_result.append(e_out)

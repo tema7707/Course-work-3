@@ -3,7 +3,9 @@ import torch
 
 import torch.nn as nn
 
+from PIL import Image
 from torch.utils.data import Dataset
+from utils import read_image, read_mask, add_mask
 
 
 class SpectralNorm(nn.Module):
@@ -63,7 +65,9 @@ class SpectralNorm(nn.Module):
         return self.module.forward(*args)
 
 class Fashion_swapper_dataset(Dataset):
-    
+    '''
+    CCP dataset whitch add mask to image 
+    '''
     def __init__(self, loader, obj=31, transform=None):
         self.objects = obj
         self.transform = transform
@@ -82,3 +86,22 @@ class Fashion_swapper_dataset(Dataset):
     
     def __len__(self):
         return self.loader['objects_count'][self.objects]
+
+class GANLoss(nn.Module):
+    def __init__(self, use_lsgan=True, target_real_label=1.0, target_fake_label=0.0):
+        super(GANLoss, self).__init__()
+        if use_lsgan:
+            self.loss = nn.MSELoss()
+        else:
+            self.loss = nn.BCELoss()
+
+    def get_target_tensor(self, input, target_is_real):
+        if target_is_real:
+            target_tensor = torch.tensor(1.0)
+        else:
+            target_tensor = torch.tensor(0.0)
+        return target_tensor.expand_as(input)
+
+    def __call__(self, input, target_is_real):
+        target_tensor = self.get_target_tensor(input, target_is_real)
+        return self.loss(input, target_tensor)
