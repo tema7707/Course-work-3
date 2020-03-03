@@ -1,3 +1,5 @@
+from network_utils.network_utils import SpectralNorm
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -8,10 +10,10 @@ class ResidualBlock(nn.Module):
         super(ResidualBlock, self).__init__()
         self._name = 'residual_block'
         self.res_block = nn.Sequential(
-            nn.Conv2d(in_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False),
+            SpectralNorm(nn.Conv2d(in_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False)),
             nn.InstanceNorm2d(out_channel, affine=True),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(out_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False),
+            SpectralNorm(nn.Conv2d(out_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False)),
             nn.InstanceNorm2d(out_channel, affine=True))
 
     def forward(self, x):
@@ -30,7 +32,7 @@ class DownsamplingBlock(nn.Module):
         self.padding = padding
 
         self.downsampling_block = nn.Sequential(
-            nn.Conv2d(self.in_channel, self.out_channel, kernel_size=self.kernel_size, stride=self.stride, padding=self.padding, bias=False),
+            SpectralNorm(nn.Conv2d(self.in_channel, self.out_channel, kernel_size=self.kernel_size, stride=self.stride, padding=self.padding, bias=False)),
             nn.InstanceNorm2d(self.out_channel, affine=True),
             nn.LeakyReLU(0.2, inplace=True))
     
@@ -65,16 +67,16 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self._name = 'resnetgenerator_encoder'
         layers = nn.ModuleList()
-        # layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False),
+        # layers.append(nn.Sequential(SpectralNorm(nn.Conv2d(c_dim, conv_dim, kernel_size=7, stride=1, padding=3, bias=False)),
         #                             nn.InstanceNorm2d(conv_dim, affine=True),
         #                             nn.LeakyReLU(0.2, inplace=True)))
-        layers.append(nn.Sequential(nn.Conv2d(c_dim, conv_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
+        layers.append(nn.Sequential(SpectralNorm(nn.Conv2d(c_dim, conv_dim//2, kernel_size=3, stride=1, padding=1, bias=False)),
                                     nn.InstanceNorm2d(conv_dim//2, affine=True),
                                     nn.LeakyReLU(0.2, inplace=True)))
-        layers.append(nn.Sequential(nn.Conv2d(conv_dim//2, conv_dim, kernel_size=3, stride=1, padding=1, bias=False),
+        layers.append(nn.Sequential(SpectralNorm(nn.Conv2d(conv_dim//2, conv_dim, kernel_size=3, stride=1, padding=1, bias=False)),
                                     nn.InstanceNorm2d(conv_dim, affine=True),
                                     nn.LeakyReLU(0.2, inplace=True)))
-        layers.append(nn.Sequential(nn.Conv2d(conv_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False),
+        layers.append(nn.Sequential(SpectralNorm(nn.Conv2d(conv_dim, conv_dim, kernel_size=3, stride=1, padding=1, bias=False)),
                                     nn.InstanceNorm2d(conv_dim, affine=True),
                                     nn.LeakyReLU(0.2, inplace=True)))
         self.curr_dim = conv_dim
@@ -120,18 +122,18 @@ class Decoder(nn.Module):
             ))
             if skip_connection:
                 self.skip.append(nn.Sequential(
-                    nn.Conv2d(self.curr_dim, self.curr_dim//2, kernel_size=kernel_size, stride=1, padding=1, bias=False),
+                    SpectralNorm(nn.Conv2d(self.curr_dim, self.curr_dim//2, kernel_size=kernel_size, stride=1, padding=1, bias=False)),
                     nn.InstanceNorm2d(self.curr_dim//2, affine=True),
                     nn.LeakyReLU(0.2, inplace=True)
                 ))
             self.curr_dim = self.curr_dim // 2
 
         self.layers.append(nn.Sequential(
-            nn.Conv2d(self.curr_dim, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
+            SpectralNorm(nn.Conv2d(self.curr_dim, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False)),
             nn.InstanceNorm2d(self.curr_dim//2, affine=True),
-            nn.Conv2d(self.curr_dim//2, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False),
+            SpectralNorm(nn.Conv2d(self.curr_dim//2, self.curr_dim//2, kernel_size=3, stride=1, padding=1, bias=False)),
             nn.InstanceNorm2d(self.curr_dim//2, affine=True),
-            nn.Conv2d(self.curr_dim//2, 4, kernel_size=3, stride=1, padding=1, bias=False),
+            SpectralNorm(nn.Conv2d(self.curr_dim//2, 4, kernel_size=3, stride=1, padding=1, bias=False)),
             nn.Tanh()
         ))
 
