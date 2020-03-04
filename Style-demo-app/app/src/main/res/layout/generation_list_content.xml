@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/list_title_margin_top"
+        android:text="@string/main_generation_button"
+        android:textAppearance="@style/TextAppearanceMainVisionNlp" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/tshirt_generation_click_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        app:descriptionRes="@string/tshirt_generation_card_description"
+        app:imageRes="@drawable/ic_tshirt"
+        app:titleRes="@string/tshirt_generation_card_title" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/hoodie_generation_click_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        app:descriptionRes="@string/hoodie_generation_card_description"
+        app:imageRes="@drawable/ic_hoodie"
+        app:titleRes="@string/hoodie_generation_card_title" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/skirt_generation_click_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        app:descriptionRes="@string/skirt_generation_card_description"
+        app:imageRes="@drawable/ic_skirt"
+        app:titleRes="@string/skirt_generation_card_title" />
+</LinearLayout>

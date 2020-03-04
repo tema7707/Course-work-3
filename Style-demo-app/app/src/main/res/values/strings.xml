@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Style</string>
+    <string name="action_settings">Settings</string>
+    <string name="welcome_skip_button">Skip</string>
+    <string name="main_vision_button">Vision</string>
+    <string name="main_generation_button">Try on</string>
+
+    <string name="vision_list_image_classification_button">Image Classification</string>
+    <string name="image_classification_title">Image Classification</string>
+    <string name="image_classification_results_header_row_name">Classification</string>
+    <string name="image_classification_results_header_row_score">Score</string>
+
+    <string name="text_classification">Text Classification</string>
+
+    <string name="welcome_page_title">Welcome</string>
+    <string name="welcome_page_description">Style mobile application</string>
+
+    <string name="welcome_page_image_classification_title">Image Classification</string>
+    <string name="welcome_page_image_classification_description">Image classification examples run packaged inside app models using output of camera</string>
+
+    <string name="welcome_page_generation_title">Try on clothes</string>
+    <string name="welcome_page_generation_description">Try on clothes description</string>
+
+    <string name="classification_send_button">Send</string>
+
+    <string name="vision_card_qmobilenet_title">Image Classification\nQuantized MobileNetV2</string>
+    <string name="vision_card_qmobilenet_description">Inference in int8.\nInput is float32 tensor of 1x3x224x224 shape</string>
+
+    <string name="vision_card_resnet_title">Image Classification\nResnet18</string>
+    <string name="vision_card_resnet_description">Default TorchVision pretrained Resnet18 model. Input is float32 tensor of 1x3x224x224 shape</string>
+
+    <string name="tshirt_generation_card_title">T-Shirt. </string>
+    <string name="tshirt_generation_card_description">Image generation.\nGAN model trained on clothes dataset.</string>
+    <string name="hoodie_generation_card_title">Hoodie</string>
+    <string name="hoodie_generation_card_description">Generate new look by given image.</string>
+    <string name="skirt_generation_card_title">Skirt</string>
+    <string name="skirt_generation_card_description">Generate new look by given image.</string>
+    <string name="clear">Clear</string>
+    <string name="text_classification_topic">Topic</string>
+    <string name="text_classification_score">Score</string>comment
+    <string name="error_dialog_text">Sorry there was an error.</string>
+    <string name="text_classification_edittext_hint">Something like a reddit comment...</string>
+    <string name="select_image_to_classification">Load image to recognize</string>
+
+</resources>
