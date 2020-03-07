@@ -72,3 +72,4 @@ datasets/test_summer
 datasets/test_winter
 datasets/train
 datasets/pixel_level
+datasets/viton_resize
