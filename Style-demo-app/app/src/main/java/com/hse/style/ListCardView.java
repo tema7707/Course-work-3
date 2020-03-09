@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.BoolRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +65,13 @@ public class ListCardView extends ConstraintLayout {
         mImageView.setVisibility(View.VISIBLE);
       } else {
         mImageView.setVisibility(View.GONE);
+      }
+
+      final boolean isLarge = a.getBoolean(R.styleable.ListCardView_isLarge, false);
+      if (isLarge) {
+        ViewGroup.LayoutParams params = mImageView.getLayoutParams();
+        params.height = 200;
+        mImageView.setLayoutParams(params);
       }
     } finally {
       a.recycle();

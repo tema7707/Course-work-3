@@ -26,6 +26,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".vision.VisionListActivity" />
         <activity android:name=".generation.GenerationListActivity" />
+        <activity android:name=".generation.ClothesListActivity" />
         <activity
             android:name=".vision.ImageClassificationActivity"
             android:label="@string/image_classification_title" />

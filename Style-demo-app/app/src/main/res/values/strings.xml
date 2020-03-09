@@ -42,4 +42,10 @@
     <string name="text_classification_edittext_hint">Something like a reddit comment...</string>
     <string name="select_image_to_classification">Load image to recognize</string>
 
+    <string name="selection_item1_description">The model was decorated with a white contrast print with the image of the brand logo and signature of the designer.</string>
+    <string name="selection_item2_description">A black t-shirt is an indispensable item in your basic wardrobe.</string>
+    <string name="selection_item3_description">A t-shirt from the spring / summer 2020 collection is the perfect way to celebrate another temperature record.</string>
+    <string name="selection_item1_title">Y-3 Print</string>
+    <string name="selection_item2_title">Y-3 Black</string>
+    <string name="selection_item3_title">TOM FORD</string>
 </resources>

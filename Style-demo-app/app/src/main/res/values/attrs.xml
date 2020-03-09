@@ -13,6 +13,7 @@
         <attr name="titleRes" format="reference" />
         <attr name="descriptionRes" format="reference" />
         <attr name="imageRes" format="reference" />
+        <attr name="isLarge" format="boolean" />
     </declare-styleable>
 
 </resources>
