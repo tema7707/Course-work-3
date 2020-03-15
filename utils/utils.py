@@ -196,8 +196,8 @@ class CPDataset(Dataset):
         im_pose = torch.tensor(np.array(im_pose).transpose(0,2,1))
         
         # cloth-agnostic representation
-        print(shape.shape)
-        print(im_h.shape)
+        # print(shape.shape)
+        # print(im_h.shape)
         pose_map = torch.tensor(np.array(pose_map).transpose(0,2,1))
         agnostic = torch.cat([shape, im_h, pose_map], 0) 
 
