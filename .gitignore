@@ -73,3 +73,8 @@ datasets/test_winter
 datasets/train
 datasets/pixel_level
 datasets/viton_resize
+.ipynb_checkpoints/
+checkpoints/
+__pycache__/
+networks/__pycache__/
+networks/__pycache__/discriminator.cpython-36.pyc
