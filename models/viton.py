@@ -1,9 +1,15 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from PIL import Image, ImageDraw
+from torchvision import transforms
+
 from torch.nn import init
 from torchvision import models
+from cp_dataset import CPDataset, CPDataLoader
 import os
-
+import time
+import easydict
 import numpy as np
 
 def weights_init_normal(m):
@@ -129,7 +135,7 @@ class FeatureRegression(nn.Module):
 
     def forward(self, x):
         x = self.conv(x)
-        x = x.view(x.size(0), -1)
+        x = x.reshape(x.size(0), -1)
         x = self.linear(x)
         x = self.tanh(x)
         return x
@@ -295,7 +301,7 @@ class UnetGenerator(nn.Module):
         super(UnetGenerator, self).__init__()
         # construct unet structure
         unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=None, norm_layer=norm_layer, innermost=True)
-        for i in range(num_downs - 5):
+        for _ in range(num_downs - 5):
             unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=unet_block, norm_layer=norm_layer, use_dropout=use_dropout)
         unet_block = UnetSkipConnectionBlock(ngf * 4, ngf * 8, input_nc=None, submodule=unet_block, norm_layer=norm_layer)
         unet_block = UnetSkipConnectionBlock(ngf * 2, ngf * 4, input_nc=None, submodule=unet_block, norm_layer=norm_layer)
@@ -411,14 +417,14 @@ class VGGLoss(nn.Module):
 class GMM(nn.Module):
     """ Geometric Matching Module
     """
-    def __init__(self, opt):
+    def __init__(self, hight, weight, grid_size):
         super(GMM, self).__init__()
         self.extractionA = FeatureExtraction(22, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d) 
         self.extractionB = FeatureExtraction(3, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d)
         self.l2norm = FeatureL2Norm()
         self.correlation = FeatureCorrelation()
-        self.regression = FeatureRegression(input_nc=192, output_dim=2*opt.grid_size**2, use_cuda=True)
-        self.gridGen = TpsGridGen(opt.fine_height, opt.fine_width, use_cuda=True, grid_size=opt.grid_size)
+        self.regression = FeatureRegression(input_nc=192, output_dim=2*grid_size**2, use_cuda=True)
+        self.gridGen = TpsGridGen(hight, weight, use_cuda=True, grid_size=grid_size)
         
     def forward(self, inputA, inputB):
         featureA = self.extractionA(inputA)
@@ -443,3 +449,161 @@ def load_checkpoint(model, checkpoint_path):
         return
     model.load_state_dict(torch.load(checkpoint_path))
     model.cuda()
+
+def run_gmm(agnostic, cloth, cloth_mask, model):
+    model.cuda()
+    model.eval()
+
+    agnostic = agnostic.cuda()
+    c = cloth.cuda()
+    cm = cloth_mask.cuda()
+        
+    grid, _ = model(agnostic[None,:,:,:], c[None,:,:,:])
+    warped_cloth = F.grid_sample(c[None,:,:,:], grid, padding_mode='border')
+    warped_mask = F.grid_sample(cm[None,:,:,:], grid, padding_mode='zeros')
+    
+    return warped_cloth, warped_mask*2-1
+
+def run_tom(agnostic, cloth, cloth_mask, model):
+    model.cuda()
+    model.eval()
+
+    agnostic = agnostic.cuda()
+    c = cloth.cuda()
+
+    outputs = model(torch.cat([agnostic[None,:,:,:], c],1))
+    p_rendered, m_composite = torch.split(outputs, 3,1)
+    p_rendered = F.tanh(p_rendered)
+    m_composite = F.sigmoid(m_composite)
+    p_tryon = c * m_composite + p_rendered * (1 - m_composite)
+
+    return p_tryon
+
+def make_image(key_points):
+    '''
+    key_points: np.array(outputs['instances'].pred_keypoints.cpu().detach()[0])
+    result of detectron keypoint
+    '''
+    transform_1d = transforms.Compose([transforms.ToTensor(), 
+                                        transforms.Normalize((0.5,), (0.5,))])
+    r = 5
+    im_pose = Image.new('L', (192, 256))
+    pose_draw = ImageDraw.Draw(im_pose)
+    left = (key_points[6, 0], key_points[6, 1])
+    right = (key_points[5, 0], key_points[5, 1])
+    key_points = np.append(key_points, [[(left[0] + right[0])/2, (left[1] + right[1])/2, 1]], axis=0)
+    point_num = key_points.shape[0]
+    pose_map = torch.zeros(point_num, 256, 192)
+    for i in range(point_num):
+        one_map = Image.new('L', (192, 256))
+        draw = ImageDraw.Draw(one_map)
+        pointx = key_points[i,0]
+        pointy = key_points[i,1]
+        if pointx > 1 and pointy > 1:
+            draw.rectangle((pointx-r, pointy-r, pointx+r, pointy+r), 'white', 'white')
+            pose_draw.rectangle((pointx-r, pointy-r, pointx+r, pointy+r), 'white', 'white')
+        # print(np.array(one_map).shape)
+        one_map = transform_1d(one_map)
+        pose_map[i] = one_map[0]
+        # plt.imshow(im_pose)
+        # plt.show()
+    return pose_map, im_pose
+
+
+# def get_opt(datamode='train', stage='GMM', checkpoint_path='checkpoint/gmm_train_new/gmm_final.pth'):
+#     opt = easydict.EasyDict({
+#       'name' : stage,
+#       'gpu_ids' : '',
+#       'workers' : 1,
+#       'batch_size' : 4,
+#       'dataroot' : 'data',
+#       'datamode' : datamode,
+#       'stage' : stage,
+#       'data_list' : 'test_pairs.txt',
+#       'fine_width' : 192,
+#       'fine_height' : 256,
+#       'radius' : 5,
+#       'grid_size' : 5,
+#       'lr' : 0.0001,
+#       'tensorboard_dir' : 'tensorboard',
+#       'result_dir' : 'data/test',
+#       'checkpoint' : checkpoint_path,
+#       # 'checkpoint' : 'checkpoint/tom_train_new/tom_final.pth',
+#       'display_count' : 20,
+#       'shuffle' : True
+#     })
+#     return opt
+# 
+# def test_tom(opt, test_loader, model, board):
+#     model.cuda()
+#     model.eval()
+    
+#     base_name = os.path.basename(opt.checkpoint)
+#     save_dir = os.path.join(opt.result_dir, base_name, opt.datamode)
+#     if not os.path.exists(save_dir):
+#         os.makedirs(save_dir)
+#     try_on_dir = os.path.join(save_dir, 'try-on')
+#     if not os.path.exists(try_on_dir):
+#         os.makedirs(try_on_dir)
+#     print('Dataset size: %05d!' % (len(test_loader.dataset)), flush=True)
+#     for step, inputs in enumerate(test_loader.data_loader):
+#         iter_start_time = time.time()
+        
+#         im_names = inputs['im_name']
+#         im = inputs['image'].cuda()
+#         im_pose = inputs['pose_image']
+#         im_h = inputs['head']
+#         shape = inputs['shape']
+
+#         agnostic = inputs['agnostic'].cuda()
+#         c = inputs['cloth'].cuda()
+#         cm = inputs['cloth_mask'].cuda()
+        
+#         outputs = model(torch.cat([agnostic, c],1))
+#         p_rendered, m_composite = torch.split(outputs, 3,1)
+#         p_rendered = F.tanh(p_rendered)
+#         m_composite = F.sigmoid(m_composite)
+#         p_tryon = c * m_composite + p_rendered * (1 - m_composite)
+
+#         visuals = [ [im_h, shape, im_pose], 
+#                    [c, 2*cm-1, m_composite], 
+#                    [p_rendered, p_tryon, im]]
+            
+#         save_images(p_tryon, im_names, try_on_dir) 
+#         if (step+1) % opt.display_count == 0:
+#             board_add_images(board, 'combine', visuals, step+1)
+#             t = time.time() - iter_start_time
+#             print('step: %8d, time: %.3f' % (step+1, t), flush=True)
+
+
+# def main():
+#     opt = get_opt()
+#     print(opt)
+#     print("Start to test stage: %s, named: %s!" % (opt.stage, opt.name))
+   
+#     # create dataset 
+#     train_dataset = CPDataset(opt)
+
+#     # create dataloader
+#     train_loader = CPDataLoader(opt, train_dataset)
+
+#     # visualization
+#     if not os.path.exists(opt.tensorboard_dir):
+#         os.makedirs(opt.tensorboard_dir)
+#     board = SummaryWriter(log_dir = os.path.join(opt.tensorboard_dir, opt.name))
+   
+#     # create model & train
+#     if opt.stage == 'GMM':
+#         model = GMM(256, 192, 5)
+#         load_checkpoint(model, opt.checkpoint)
+#         with torch.no_grad():
+#             test_gmm(opt, train_loader, model, board)
+#     elif opt.stage == 'TOM':
+#         model = UnetGenerator(25, 4, 6, ngf=64, norm_layer=nn.InstanceNorm2d)
+#         load_checkpoint(model, opt.checkpoint)
+#         with torch.no_grad():
+#             test_tom(opt, train_loader, model, board)
+#     else:
+#         raise NotImplementedError('Model [%s] is not implemented' % opt.stage)
+  
+#     print('Finished test %s, named: %s!' % (opt.stage, opt.name))
