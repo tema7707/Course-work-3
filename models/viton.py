@@ -1,3 +1,7 @@
+import sys
+sys.path.append('..')
+sys.path.append('.')
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -450,35 +454,6 @@ def load_checkpoint(model, checkpoint_path):
     model.load_state_dict(torch.load(checkpoint_path))
     model.cuda()
 
-def run_gmm(agnostic, cloth, cloth_mask, model):
-    model.cuda()
-    model.eval()
-
-    agnostic = agnostic.cuda()
-    c = cloth.cuda()
-    cm = cloth_mask.cuda()
-        
-    grid, _ = model(agnostic[None,:,:,:], c[None,:,:,:])
-    warped_cloth = F.grid_sample(c[None,:,:,:], grid, padding_mode='border')
-    warped_mask = F.grid_sample(cm[None,:,:,:], grid, padding_mode='zeros')
-    
-    return warped_cloth, warped_mask*2-1
-
-def run_tom(agnostic, cloth, cloth_mask, model):
-    model.cuda()
-    model.eval()
-
-    agnostic = agnostic.cuda()
-    c = cloth.cuda()
-
-    outputs = model(torch.cat([agnostic[None,:,:,:], c],1))
-    p_rendered, m_composite = torch.split(outputs, 3,1)
-    p_rendered = F.tanh(p_rendered)
-    m_composite = F.sigmoid(m_composite)
-    p_tryon = c * m_composite + p_rendered * (1 - m_composite)
-
-    return p_tryon
-
 def make_image(key_points):
     '''
     key_points: np.array(outputs['instances'].pred_keypoints.cpu().detach()[0])
@@ -502,12 +477,66 @@ def make_image(key_points):
         if pointx > 1 and pointy > 1:
             draw.rectangle((pointx-r, pointy-r, pointx+r, pointy+r), 'white', 'white')
             pose_draw.rectangle((pointx-r, pointy-r, pointx+r, pointy+r), 'white', 'white')
-        # print(np.array(one_map).shape)
         one_map = transform_1d(one_map)
         pose_map[i] = one_map[0]
-        # plt.imshow(im_pose)
-        # plt.show()
     return pose_map, im_pose
+
+class Viton():
+
+    def __init__(self, weight=192, hight=256, grid_size=5,
+                gmm_checkpoint_path='checkpoint', tom_checkpoint_path='checkpoint'):
+
+        self.gmm = GMM(hight, weight, grid_size)
+        self.gmm.load_state_dict(torch.load(gmm_checkpoint_path))
+        self.gmm.cuda()
+
+        self.tom = UnetGenerator(25, 4, 6, ngf=64, norm_layer=nn.InstanceNorm2d)
+        self.tom.load_state_dict(torch.load(tom_checkpoint_path))
+        self.tom.cuda()
+
+    def get_agnostic(self, shape, head, pose_map):
+        agnostic = torch.cat([shape, head, pose_map], 0)
+        return agnostic
+
+
+    def run_viton(self, head, pose_map, shape, cloth, cloth_mask):
+        agnostic = self.get_agnostic(shape, head, pose_map)
+        warped_cloth, warped_mask = self.gmm_inference(agnostic, cloth, cloth_mask)
+        try_on = self.tom_inference(agnostic, warped_cloth, warped_mask)
+        return try_on
+
+    
+    def gmm_inference(self, agnostic, cloth, cloth_mask):
+        self.gmm.eval()
+
+        agnostic = agnostic.cuda()
+        c = cloth.cuda()
+        cm = cloth_mask.cuda()
+            
+        grid, _ = self.gmm(agnostic[None,:,:,:], c[None,:,:,:])
+        warped_cloth = F.grid_sample(c[None,:,:,:], grid, padding_mode='border')
+        warped_mask = F.grid_sample(cm[None,:,:,:], grid, padding_mode='zeros')
+        
+        return warped_cloth, warped_mask*2-1
+
+    
+    def tom_inference(self, agnostic, cloth):
+        self.tom.eval()
+
+        agnostic = agnostic.cuda()
+        c = cloth.cuda()
+
+        outputs = self.tom(torch.cat([agnostic[None,:,:,:], c],1))
+        p_rendered, m_composite = torch.split(outputs, 3,1)
+        p_rendered = F.tanh(p_rendered)
+        m_composite = F.sigmoid(m_composite)
+        p_tryon = c * m_composite + p_rendered * (1 - m_composite)
+
+        return p_tryon
+
+
+
+
 
 
 # def get_opt(datamode='train', stage='GMM', checkpoint_path='checkpoint/gmm_train_new/gmm_final.pth'):
