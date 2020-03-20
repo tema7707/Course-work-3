@@ -1,7 +1,0 @@
-md5: 9459172ed893a84fcd3a300c78f6f7f7
-outs:
-- md5: 48a058e883406c7c2ee46366129edf06.dir
-  path: pixel-level
-  cache: true
-  metric: false
-  persist: false
