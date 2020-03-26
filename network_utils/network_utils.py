@@ -16,17 +16,16 @@ from torch.utils.data import Dataset
 # from utils.utils import read_image, read_mask, add_mask
 
 class CPDataset(Dataset):
-    def __init__(self, opt):
+    def __init__(self, dataroot='data_viton', datamode='train', stage='GMM', data_list='train_pairs.txt'):
         super(CPDataset, self).__init__()
-        self.opt = opt
-        self.root = opt.dataroot
-        self.datamode = opt.datamode
-        self.stage = opt.stage
-        self.data_list = opt.data_list
-        self.fine_height = opt.fine_height
-        self.fine_width = opt.fine_width
-        self.radius = opt.radius
-        self.data_path = os.path.join(opt.dataroot, opt.datamode)
+        self.root = dataroot
+        self.datamode = datamode
+        self.stage = stage
+        self.data_list = data_list
+        self.fine_height = 256
+        self.fine_width = 192
+        self.radius = 5
+        self.data_path = os.path.join(dataroot, datamode)
         self.transform = transforms.Compose([  \
                 transforms.ToTensor(),   \
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -41,7 +40,7 @@ class CPDataset(Dataset):
 
         im_names = []
         c_names = []
-        with open(os.path.join(opt.dataroot, opt.data_list), 'r') as f:
+        with open(os.path.join(dataroot, data_list), 'r') as f:
             for line in f.readlines():
                 im_name, c_name = line.strip().split()
                 im_names.append(im_name)
@@ -132,11 +131,11 @@ class CPDataset(Dataset):
         # cloth-agnostic representation
         agnostic = torch.cat([shape, im_h, pose_map], 0)  #$$ 1 + 1? + 18 =
 
-        if self.stage == 'GMM':
-            im_g = Image.open('grid.png')
-            im_g = self.transform(im_g)
-        else:
-            im_g = ''
+        # if self.stage == 'GMM':
+        #     im_g = Image.open('grid.png')
+        #     im_g = self.transform(im_g)
+        # else:
+        #     im_g = ''
 
         result = {
             'c_name':   c_name,     # for visualization
@@ -149,7 +148,7 @@ class CPDataset(Dataset):
             'shape': shape,         # for visualization
             'head': im_h,           # for visualization
             'pose_image': im_pose,  # for visualization
-            'grid_image': im_g,     # for visualization
+            # 'grid_image': im_g,     # for visualization
             }
 
         return result

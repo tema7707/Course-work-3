@@ -10,7 +10,7 @@ from torchvision import transforms
 
 from torch.nn import init
 from torchvision import models
-from cp_dataset import CPDataset, CPDataLoader
+from network_utils.network_utils import CPDataset, CPDataLoader
 import os
 import time
 import easydict
@@ -501,8 +501,8 @@ class Viton():
 
     def run_viton(self, head, pose_map, shape, cloth, cloth_mask):
         agnostic = self.get_agnostic(shape, head, pose_map)
-        warped_cloth, warped_mask = self.gmm_inference(agnostic, cloth, cloth_mask)
-        try_on = self.tom_inference(agnostic, warped_cloth, warped_mask)
+        warped_cloth, _ = self.gmm_inference(agnostic, cloth, cloth_mask)
+        try_on = self.tom_inference(agnostic, warped_cloth)
         return try_on
 
     
