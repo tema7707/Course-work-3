@@ -37,6 +37,9 @@ def pipeline(img, cloth, cloth_mask):
                             "./checkpoint/densepose_rcnn_R_50_FPN_s1x.pkl")
     phead, body = dp.predict(im_255)
     body = cv2.resize(body, (192, 256), interpolation = cv2.INTER_AREA)
+    body = Image.fromarray((body*255).astype(np.uint8))
+    body = body.resize((192//16, 256//16), Image.BILINEAR)
+    body = body.resize((192, 256), Image.BILINEAR)
     phead = cv2.resize(phead, (192, 256), interpolation = cv2.INTER_AREA)
     phead = torch.from_numpy(phead[np.newaxis,:,:])
     head = img * phead - (1 - phead)
@@ -47,6 +50,8 @@ def pipeline(img, cloth, cloth_mask):
 
     viton = Viton(gmm_checkpoint_path='./checkpoint/gmm_train_new/gmm_final.pth', 
                 tom_checkpoint_path='./checkpoint/tom_train_new/tom_final.pth')
+    shape = Image.open('./datasets/data/train/cloth/000003_1.jpg') # path to cloth
+    shape = transform_1d(shape)
     res = viton.run_viton(head, pose_map, shape, cloth, cloth_mask)
     return res
 
@@ -57,7 +62,7 @@ def decode(byte64_str):
 
 
 def encode(img):
-    pil_img = Image.fromarray(img)
+    pil_img = Image.fromarray(img.astype('uint8'))
     pil_img = pil_img.convert('RGB')
     buff = BytesIO()
     pil_img.save(buff, format="JPEG")
@@ -79,7 +84,7 @@ def predict():
 
         img = decode(file)
         res = pipeline(img, c, cm)
-    return res
+    return encode(np.array(res[0].cpu().detach()).transpose(1,2,0) * 255)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,7 @@
+md5: eb0efd22f168b6eb11442f0752f86a26
+outs:
+- md5: 6908c0b39d87432117bfec4f46100a74.dir
+  path: checkpoint
+  cache: true
+  metric: false
+  persist: false
