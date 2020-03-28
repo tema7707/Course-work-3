@@ -18,7 +18,7 @@ from .viton import make_image
 
 class KeyPointPredictor:
     """
-        Class that segmentate human body parts (head, body, arms, legs and e.g.)
+        Class that forecast human body keypoints
 
         Simple sequence to evaluate:
 
@@ -38,8 +38,8 @@ class KeyPointPredictor:
             head, body = dp.predict(image) # get masks
     """
 
-    def __init__(self, cfg_path, model_path):
-        pass
+    def __init__(self):
+        self.cfg = self.setup_config()
 
     def setup_config(self):
         cfg = get_cfg()
@@ -50,8 +50,7 @@ class KeyPointPredictor:
         return cfg
 
     def predict(self, img):
-        cfg = self.setup_config()
-        predictor = DefaultPredictor(cfg)
+        predictor = DefaultPredictor(self.cfg)
         with torch.no_grad():
             outputs = predictor(img)["instances"].pred_keypoints.cpu().detach()[0]
             return KeyPointPredictor.format2viton(outputs)
