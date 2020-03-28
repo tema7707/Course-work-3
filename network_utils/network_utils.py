@@ -4,25 +4,28 @@ sys.path.append('.')
 
 import torch.utils.data
 import torch
+import os
+from torchvision import transforms
+import numpy as np
+import json
 
 import torch.nn as nn
 
-from PIL import Image
+from PIL import Image, ImageDraw
 from torch.utils.data import Dataset
 # from utils.utils import read_image, read_mask, add_mask
 
-class CPDataset(data.Dataset):
-    def __init__(self, opt):
+class CPDataset(Dataset):
+    def __init__(self, dataroot='data_viton', datamode='train', stage='GMM', data_list='train_pairs.txt'):
         super(CPDataset, self).__init__()
-        self.opt = opt
-        self.root = opt.dataroot
-        self.datamode = opt.datamode
-        self.stage = opt.stage
-        self.data_list = opt.data_list
-        self.fine_height = opt.fine_height
-        self.fine_width = opt.fine_width
-        self.radius = opt.radius
-        self.data_path = osp.join(opt.dataroot, opt.datamode)
+        self.root = dataroot
+        self.datamode = datamode
+        self.stage = stage
+        self.data_list = data_list
+        self.fine_height = 256
+        self.fine_width = 192
+        self.radius = 5
+        self.data_path = os.path.join(dataroot, datamode)
         self.transform = transforms.Compose([  \
                 transforms.ToTensor(),   \
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -37,7 +40,7 @@ class CPDataset(data.Dataset):
 
         im_names = []
         c_names = []
-        with open(osp.join(opt.dataroot, opt.data_list), 'r') as f:
+        with open(os.path.join(dataroot, data_list), 'r') as f:
             for line in f.readlines():
                 im_name, c_name = line.strip().split()
                 im_names.append(im_name)
@@ -55,11 +58,11 @@ class CPDataset(data.Dataset):
 
         # cloth image & cloth mask
         if self.stage == 'GMM':
-            c = Image.open(osp.join(self.data_path, 'cloth', c_name))
-            cm = Image.open(osp.join(self.data_path, 'cloth-mask', c_name))
+            c = Image.open(os.path.join(self.data_path, 'cloth', c_name))
+            cm = Image.open(os.path.join(self.data_path, 'cloth-mask', c_name))
         else:
-            c = Image.open(osp.join(self.data_path, 'warp-cloth', c_name))
-            cm = Image.open(osp.join(self.data_path, 'warp-mask', c_name))
+            c = Image.open(os.path.join(self.data_path, 'warp-cloth', c_name))
+            cm = Image.open(os.path.join(self.data_path, 'warp-mask', c_name))
      
         c = self.transform(c)  # [-1,1]
         cm_array = np.array(cm)
@@ -68,12 +71,12 @@ class CPDataset(data.Dataset):
         cm.unsqueeze_(0)
 
         # person image 
-        im = Image.open(osp.join(self.data_path, 'image', im_name))
+        im = Image.open(os.path.join(self.data_path, 'image', im_name))
         im = self.transform(im) # [-1,1]
 
         # load parsing image
         parse_name = im_name.replace('.jpg', '.png')
-        im_parse = Image.open(osp.join(self.data_path, 'image-parse', parse_name))
+        im_parse = Image.open(os.path.join(self.data_path, 'image-parse', parse_name))
         #$$ im_parse.shape = [1,256,192]. png color image is with colormap.
         parse_array = np.array(im_parse)
         parse_shape = (parse_array > 0).astype(np.float32) #$$ 0 or 1
@@ -100,7 +103,7 @@ class CPDataset(data.Dataset):
 
         # load pose points
         pose_name = im_name.replace('.jpg', '_keypoints.json')
-        with open(osp.join(self.data_path, 'pose', pose_name), 'r') as f:
+        with open(os.path.join(self.data_path, 'pose', pose_name), 'r') as f:
             pose_label = json.load(f)
             pose_data = pose_label['people'][0]['pose_keypoints']
             pose_data = np.array(pose_data)
@@ -128,11 +131,11 @@ class CPDataset(data.Dataset):
         # cloth-agnostic representation
         agnostic = torch.cat([shape, im_h, pose_map], 0)  #$$ 1 + 1? + 18 =
 
-        if self.stage == 'GMM':
-            im_g = Image.open('grid.png')
-            im_g = self.transform(im_g)
-        else:
-            im_g = ''
+        # if self.stage == 'GMM':
+        #     im_g = Image.open('grid.png')
+        #     im_g = self.transform(im_g)
+        # else:
+        #     im_g = ''
 
         result = {
             'c_name':   c_name,     # for visualization
@@ -145,7 +148,7 @@ class CPDataset(data.Dataset):
             'shape': shape,         # for visualization
             'head': im_h,           # for visualization
             'pose_image': im_pose,  # for visualization
-            'grid_image': im_g,     # for visualization
+            # 'grid_image': im_g,     # for visualization
             }
 
         return result

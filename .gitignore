@@ -72,9 +72,14 @@ datasets/test_summer
 datasets/test_winter
 datasets/train
 datasets/pixel_level
-datasets/viton_resize
+datasets/data
 .ipynb_checkpoints/
-checkpoints/
 __pycache__/
 networks/__pycache__/
 networks/__pycache__/discriminator.cpython-36.pyc
+/checkpoints/*
+/detectron2_repo
+checkpoints/densepose_rcnn_R_50_FPN_s1x.pkl
+checkpoints/model_0019999.pth
+checkpoints/model_0024499.pth
+checkpoints/*
