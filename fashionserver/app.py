@@ -53,7 +53,7 @@ def pipeline(img, cloth, cloth_mask):
 def decode(byte64_str):
     bytes = BytesIO(base64.b64decode(byte64_str))
     pil_img = PIL.Image.open(bytes)
-    return np.array(pil_img)
+    return pil_img
 
 
 def encode(img):
@@ -66,7 +66,7 @@ def encode(img):
 @app.route('/style/api/v1.0/segmentate', methods=['POST'])
 def predict():
     if request.method == 'POST':
-        file = request.files['file']
+        file = request.values['file']
         cloth_id = int(request.values['cloth'])
         if cloth_id == 0:
             c = Image.open('./datasets/data/train/cloth/000003_1.jpg') # path to cloth
@@ -77,7 +77,7 @@ def predict():
             cm = torch.from_numpy(cm_array)
             cm.unsqueeze_(0)
 
-        img = Image.open(io.BytesIO(file.read()))
+        img = decode(file)
         res = pipeline(img, c, cm)
     return res
 
