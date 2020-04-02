@@ -46,7 +46,24 @@ def pipeline(img, cloth, cloth_mask):
     shape = transform_1d(body)
 
     key_model = KeyPointPredictor()
-    pose_map, im_pose = key_model.predict(img_array)
+    pose_map, _ = key_model.predict(img_array)
+
+    pose_map_corect = torch.zeros((18, 256, 192)) - 1 
+    pose_map_corect[0] = pose_map[0]
+    pose_map_corect[1] = pose_map[17]
+    pose_map_corect[2] = pose_map[6]
+    pose_map_corect[3] = pose_map[8]
+    pose_map_corect[4] = pose_map[10]
+    pose_map_corect[5] = pose_map[5]
+    pose_map_corect[6] = pose_map[7]
+    pose_map_corect[7] = pose_map[9]
+    pose_map_corect[8] = pose_map[12]
+    pose_map_corect[11] = pose_map[11]
+    pose_map_corect[14] = pose_map[2]
+    pose_map_corect[15] = pose_map[1]
+    pose_map_corect[16] = pose_map[4]
+    pose_map_corect[17] = pose_map[3]
+    pose_map = torch.tensor(pose_map_corect).type(torch.float32)
 
     viton = Viton(gmm_checkpoint_path='./checkpoint/gmm_train_new/gmm_final.pth', 
                 tom_checkpoint_path='./checkpoint/tom_train_new/tom_final.pth')
