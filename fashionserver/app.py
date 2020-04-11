@@ -1,5 +1,6 @@
 import sys
 sys.path.append('..')
+sys.path.append('.')
 
 import io
 import numpy as np
@@ -14,6 +15,7 @@ from models.keypoint import KeyPointPredictor
 from models.segmentation import Segmentator
 from models.posenet import DensePosePredictor
 from network_utils.network_utils import CPDataset
+from utils.utils import convert_image
 from torchvision import transforms
 
 from flask import Flask, jsonify, request
@@ -31,6 +33,8 @@ transform_1d = transforms.Compose([ \
 
 def pipeline(img, cloth, cloth_mask):
     img_array = np.array(img)
+    img_array = convert_image(img)
+    img = Image.fromarray(convert_image(np.array(img)))
     img = transform(img)
     im_255 = cv2.resize(img_array, (255, 255), interpolation = cv2.INTER_AREA)
     dp = DensePosePredictor("./detectron2_repo/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml", 

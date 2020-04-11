@@ -313,6 +313,27 @@ def cut_mask(image, mask, element):
     image_mask = cv2.bitwise_and(image, image, mask = cloth_mask)
     return image_mask
 
+def convert_image(image, hight_res=256, weight_res=192, conv_type='resize'):
+    '''
+    image: numpy.array
+    conv_type: string, 'crop'/'resize'
+    '''
+    hight, weight, _ = image.shape
+    coef = hight_res / weight_res
+    new_x = weight
+    new_y = hight
+    if hight / weight < coef:
+        new_x = int(hight / coef) 
+    if hight / weight > coef:
+        new_y = int(weight * coef)
+    image = image[hight//2-new_y//2:hight//2+new_y//2, weight//2-new_x//2:weight//2+new_x//2, :]
+    if conv_type == 'crop':
+        startx = weight//2-(weight_res//2)
+        starty = hight//2-(hight_res//2)    
+        return image[starty:starty+hight_res,startx:startx+weight_res]
+    if conv_type == 'resize':
+        return cv2.resize(image, (weight_res, hight_res), interpolation = cv2.INTER_AREA)
+
 def add_mask(image, mask, axis=0):
     '''
     add mask to image
