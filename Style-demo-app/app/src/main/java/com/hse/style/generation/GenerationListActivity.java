@@ -2,10 +2,10 @@ package com.hse.style.generation;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.hse.style.AbstractListActivity;
 import com.hse.style.R;
-import com.hse.style.vision.ImageClassificationActivity;
 
 public class GenerationListActivity extends AbstractListActivity {
 
@@ -15,15 +15,16 @@ public class GenerationListActivity extends AbstractListActivity {
     // TODO: change it to RecyclerView
     findViewById(R.id.tshirt_generation_click_area).setOnClickListener(v -> {
       final Intent intent = new Intent(GenerationListActivity.this, ClothesListActivity.class);
+      intent.putExtra(Intent.EXTRA_INDEX, 0);
       startActivity(intent);
     });
-    findViewById(R.id.hoodie_generation_click_area).setOnClickListener(v -> {
+    findViewById(R.id.sweater_generation_click_area).setOnClickListener(v -> {
       final Intent intent = new Intent(GenerationListActivity.this, ClothesListActivity.class);
+      intent.putExtra(Intent.EXTRA_INDEX, 3);
       startActivity(intent);
      });
     findViewById(R.id.skirt_generation_click_area).setOnClickListener(v -> {
-      final Intent intent = new Intent(GenerationListActivity.this, ClothesListActivity.class);
-      startActivity(intent);
+      Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show();
     });
   }
 

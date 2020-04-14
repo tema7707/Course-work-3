@@ -7,42 +7,40 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/clothes_list_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/list_title_margin_top"
-        android:text="T-shirts"
+        android:text="@string/model_selection_title"
         android:textAppearance="@style/TextAppearanceMainVisionNlp" />
 
     <com.hse.style.ListCardView
-        android:id="@+id/clothes_item_1"
+        android:id="@+id/models_item_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_content_margin"
         android:elevation="1dp"
-        app:descriptionRes="@string/selection_item1_description"
-        app:imageRes="@drawable/tshirt1"
-        app:titleRes="@string/selection_item1_title" />
+        app:descriptionRes="@string/pose_segmentation_description"
+        app:imageRes="@drawable/ic_man"
+        app:titleRes="@string/pose_segmentation_title" />
 
     <com.hse.style.ListCardView
-        android:id="@+id/clothes_item_2"
+        android:id="@+id/models_item_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_content_margin"
         android:elevation="1dp"
-        app:descriptionRes="@string/selection_item2_description"
-        app:imageRes="@drawable/tshirt2"
-        app:titleRes="@string/selection_item2_title" />
+        app:descriptionRes="@string/tshirt_segmentation_description"
+        app:imageRes="@drawable/ic_tshirt"
+        app:titleRes="@string/tshirt_segmentation_title" />
 
     <com.hse.style.ListCardView
-        android:id="@+id/clothes_item_3"
+        android:id="@+id/models_item_3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_content_margin"
         android:elevation="1dp"
-        app:descriptionRes="@string/selection_item3_description"
-        app:imageRes="@drawable/tshirt3"
-        app:titleRes="@string/selection_item3_title"
-        app:isLarge="true" />
+        app:descriptionRes="@string/tshirt_grub_segmentation_description"
+        app:imageRes="@drawable/ic_tshirt"
+        app:titleRes="@string/tshirt_grub_segmentation_title" />
 </LinearLayout>

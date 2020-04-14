@@ -25,14 +25,14 @@
         app:titleRes="@string/tshirt_generation_card_title" />
 
     <com.hse.style.ListCardView
-        android:id="@+id/hoodie_generation_click_area"
+        android:id="@+id/sweater_generation_click_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_content_margin"
         android:elevation="1dp"
-        app:descriptionRes="@string/hoodie_generation_card_description"
-        app:imageRes="@drawable/ic_hoodie"
-        app:titleRes="@string/hoodie_generation_card_title" />
+        app:descriptionRes="@string/sweater_generation_card_description"
+        app:imageRes="@drawable/ic_sweater"
+        app:titleRes="@string/sweater_generation_card_title" />
 
     <com.hse.style.ListCardView
         android:id="@+id/skirt_generation_click_area"
@@ -40,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/list_content_margin"
         android:elevation="1dp"
+        android:alpha="0.8"
         app:descriptionRes="@string/skirt_generation_card_description"
         app:imageRes="@drawable/ic_skirt"
         app:titleRes="@string/skirt_generation_card_title" />

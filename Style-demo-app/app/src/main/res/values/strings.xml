@@ -2,7 +2,7 @@
     <string name="app_name">Style</string>
     <string name="action_settings">Settings</string>
     <string name="welcome_skip_button">Skip</string>
-    <string name="main_vision_button">Vision</string>
+    <string name="main_vision_button">Segment</string>
     <string name="main_generation_button">Try on</string>
 
     <string name="vision_list_image_classification_button">Image Classification</string>
@@ -10,18 +10,12 @@
     <string name="image_classification_results_header_row_name">Classification</string>
     <string name="image_classification_results_header_row_score">Score</string>
 
-    <string name="text_classification">Text Classification</string>
-
     <string name="welcome_page_title">Welcome</string>
     <string name="welcome_page_description">Style mobile application</string>
-
-    <string name="welcome_page_image_classification_title">Image Classification</string>
-    <string name="welcome_page_image_classification_description">Image classification examples run packaged inside app models using output of camera</string>
-
+    <string name="welcome_page_image_classification_title">Image Segmentation</string>
+    <string name="welcome_page_image_classification_description">Here you can segment clothes in photos</string>
     <string name="welcome_page_generation_title">Try on clothes</string>
-    <string name="welcome_page_generation_description">Try on clothes description</string>
-
-    <string name="classification_send_button">Send</string>
+    <string name="welcome_page_generation_description">With this mobile application you can virtually try on clothes</string>
 
     <string name="vision_card_qmobilenet_title">Image Classification\nQuantized MobileNetV2</string>
     <string name="vision_card_qmobilenet_description">Inference in int8.\nInput is float32 tensor of 1x3x224x224 shape</string>
@@ -30,22 +24,35 @@
     <string name="vision_card_resnet_description">Default TorchVision pretrained Resnet18 model. Input is float32 tensor of 1x3x224x224 shape</string>
 
     <string name="tshirt_generation_card_title">T-Shirt. </string>
-    <string name="tshirt_generation_card_description">Image generation.\nGAN model trained on clothes dataset.</string>
-    <string name="hoodie_generation_card_title">Hoodie</string>
-    <string name="hoodie_generation_card_description">Generate new look by given image.</string>
+    <string name="tshirt_generation_card_description">Generates a new look replacing your T-shirt.</string>
+    <string name="sweater_generation_card_title">Sweater</string>
+    <string name="sweater_generation_card_description">Generates a new look replacing your sweater.</string>
     <string name="skirt_generation_card_title">Skirt</string>
-    <string name="skirt_generation_card_description">Generate new look by given image.</string>
-    <string name="clear">Clear</string>
-    <string name="text_classification_topic">Topic</string>
-    <string name="text_classification_score">Score</string>comment
+    <string name="skirt_generation_card_description">Generates a new look replacing your skirt.</string>
     <string name="error_dialog_text">Sorry there was an error.</string>
-    <string name="text_classification_edittext_hint">Something like a reddit comment...</string>
     <string name="select_image_to_classification">Load image to recognize</string>
 
-    <string name="selection_item1_description">The model was decorated with a white contrast print with the image of the brand logo and signature of the designer.</string>
+    <string name="selection_item1_description">The model was decorated with a red contrast print with the image of the brand logo.</string>
     <string name="selection_item2_description">A black t-shirt is an indispensable item in your basic wardrobe.</string>
     <string name="selection_item3_description">A t-shirt from the spring / summer 2020 collection is the perfect way to celebrate another temperature record.</string>
-    <string name="selection_item1_title">Y-3 Print</string>
-    <string name="selection_item2_title">Y-3 Black</string>
-    <string name="selection_item3_title">TOM FORD</string>
+    <string name="selection_item4_description">The black model was decorated with a gray brand logo.</string>
+    <string name="selection_item5_description">Simple red sweater with a famous logo.</string>
+    <string name="selection_item6_description">A sweater from the spring / summer 2020 collection</string>
+
+    <string name="selection_item1_title">Vans Black</string>
+    <string name="selection_item2_title">Puma</string>
+    <string name="selection_item3_title">Levis</string>
+    <string name="selection_item4_title">GANT</string>
+    <string name="selection_item5_title">Adidas</string>
+    <string name="selection_item6_title">Newport Crew</string>
+
+    <string name="model_selection_title">Models</string>
+    <string name="pose_segmentation_title">Pose</string>
+    <string name="pose_segmentation_description">Segmentation of body and head.</string>
+    <string name="tshirt_grub_segmentation_title">T-shirt with GrabCut</string>
+    <string name="tshirt_grub_segmentation_description">Segmentation of T-shirts with neural network and GrabCut algorithm.</string>
+    <string name="tshirt_segmentation_title">T-shirt</string>
+    <string name="tshirt_segmentation_description">Segmentation of T-shirts with Mask R-CNN neural network.</string>
+
+    <string name="classification_select_button">Select photo</string>
 </resources>

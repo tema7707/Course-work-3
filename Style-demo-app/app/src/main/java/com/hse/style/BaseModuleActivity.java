@@ -56,7 +56,6 @@ public class BaseModuleActivity extends AppCompatActivity {
       mBackgroundThread = null;
       mBackgroundHandler = null;
     } catch (InterruptedException e) {
-      Log.e(Constants.TAG, "Error on stopping background thread", e);
     }
   }
 

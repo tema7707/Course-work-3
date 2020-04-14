@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/clothes_list_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/list_title_margin_top"
+        android:text="T-shirts"
+        android:textAppearance="@style/TextAppearanceMainVisionNlp" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/clothes_item_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:descriptionRes="@string/selection_item1_description"
+        app:imageRes="@drawable/tshirt4"
+        app:titleRes="@string/selection_item1_title" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/clothes_item_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:descriptionRes="@string/selection_item2_description"
+        app:imageRes="@drawable/tshirt5"
+        app:titleRes="@string/selection_item2_title" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/clothes_item_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:descriptionRes="@string/selection_item3_description"
+        app:imageRes="@drawable/tshirt6"
+        app:titleRes="@string/selection_item3_title"
+        app:isLarge="true" />
+    <com.hse.style.ListCardView
+        android:id="@+id/clothes_item_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:descriptionRes="@string/selection_item4_description"
+        app:imageRes="@drawable/tshirt7"
+        app:titleRes="@string/selection_item4_title" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/clothes_item_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:descriptionRes="@string/selection_item5_description"
+        app:imageRes="@drawable/tshirt8"
+        app:titleRes="@string/selection_item5_title" />
+
+    <com.hse.style.ListCardView
+        android:id="@+id/clothes_item_6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/list_content_margin"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:descriptionRes="@string/selection_item6_description"
+        app:imageRes="@drawable/tshirt9"
+        app:titleRes="@string/selection_item6_title"
+        app:isLarge="true" />
+</LinearLayout>

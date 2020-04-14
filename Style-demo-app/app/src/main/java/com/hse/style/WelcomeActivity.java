@@ -40,11 +40,11 @@ public class WelcomeActivity extends AppCompatActivity {
           R.string.welcome_page_description),
       new PageData(
           R.string.welcome_page_image_classification_title,
-          R.drawable.ic_image_classification_l,
+          R.drawable.ic_man_large,
           R.string.welcome_page_image_classification_description),
       new PageData(
           R.string.welcome_page_generation_title,
-          R.drawable.ic_image_classification_l,
+          R.drawable.ic_tshirt_white_l,
           R.string.welcome_page_generation_description)
   };
 

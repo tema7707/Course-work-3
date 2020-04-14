@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".vision.DetectronClassificationActivity"></activity>
+        <activity android:name=".ImageSendingActivity"></activity>
         <activity
             android:name=".WelcomeActivity"
             android:label="@string/app_name">
@@ -24,12 +24,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".vision.VisionListActivity" />
         <activity android:name=".generation.GenerationListActivity" />
         <activity android:name=".generation.ClothesListActivity" />
-        <activity
-            android:name=".vision.ImageClassificationActivity"
-            android:label="@string/image_classification_title" />
+        <activity android:name=".vision.ModelsListActivity" />
     </application>
 
 </manifest>
