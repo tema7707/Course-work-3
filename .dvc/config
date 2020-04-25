@@ -1,5 +1,5 @@
 ['remote "mynewremote"']
 url = s3://imagepreproc/fashion
-region = eu-north-1
+region = eu-north-2
 [core]
 remote = mynewremote

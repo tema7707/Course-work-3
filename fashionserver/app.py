@@ -1,6 +1,7 @@
 import sys
 
 sys.path.append('..')
+sys.path.append('.')
 
 import io
 import numpy as np
@@ -16,6 +17,7 @@ from models.segmentation import Segmentator
 from models.posenet import DensePosePredictor
 from models.segmentation import Segmentator
 from network_utils.network_utils import CPDataset
+from utils.utils import convert_image
 from torchvision import transforms
 
 from flask import Flask, jsonify, request
@@ -31,38 +33,47 @@ transform_1d = transforms.Compose([transforms.ToTensor(), transforms.Normalize((
 
 def pipeline(img, cloth, cloth_mask):
     img_array = np.array(img)
-    cv2.imwrite("get.jpg", img_array[:, :, ::-1])
-    image = cv2.imread("get.jpg")
+    img_array = convert_image(img)
+    img = Image.fromarray(convert_image(np.array(img)))
     img = transform(img)
-    dp = DensePosePredictor("../detectron2_repo/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml",
-                            "../checkpoints_from_gd/densepose_rcnn_R_50_FPN_s1x.pkl")
-    phead, body = dp.predict(image)
-    # body = gaussian_filter(body, sigma=7)
-    body = Image.fromarray((body * 255).astype(np.uint8))
-    body = body.resize((24, 32), Image.BILINEAR)
-    body = body.resize((img_array.shape[1], img_array.shape[0]), Image.BILINEAR)
-    ########## BODY SHAPE ##########
-    body = cv2.imread('/home/tema/Projects/Course-work-3/datasets/viton_resize/train/image-parse/000225_0.png',
-                      cv2.IMREAD_GRAYSCALE)
-    phead = np.zeros(body.shape)
-    phead[body == 28] = 1
-    phead[body == 75] = 1
-    body[body == 28] = 0  # face
-    body[body == 75] = 0  # hair
-    body[body != 0] = 1
-    body = Image.fromarray((body * 255).astype(np.uint8))
-    body = body.resize((24, 32), Image.BILINEAR)
+    im_255 = cv2.resize(img_array, (255, 255), interpolation = cv2.INTER_AREA)
+    dp = DensePosePredictor("./detectron2_repo/projects/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml", 
+                            "./checkpoint/densepose_rcnn_R_50_FPN_s1x.pkl")
+    phead, body = dp.predict(im_255)
+    body = cv2.resize(body, (192, 256), interpolation = cv2.INTER_AREA)
+    body = Image.fromarray((body*255).astype(np.uint8))
+    body = body.resize((192//16, 256//16), Image.BILINEAR)
     body = body.resize((192, 256), Image.BILINEAR)
-    ################################
-    phead = torch.from_numpy(phead[np.newaxis, :, :]).type(torch.float32)
+    phead = cv2.resize(phead, (192, 256), interpolation = cv2.INTER_AREA)
+    phead = torch.from_numpy(phead[np.newaxis,:,:])
     head = img * phead - (1 - phead)
     shape = transform_1d(body).type(torch.float32)
 
     key_model = KeyPointPredictor()
-    pose_map, im_pose = key_model.predict(img_array)
+    pose_map, _ = key_model.predict(img_array)
 
-    viton = Viton(gmm_checkpoint_path='./../checkpoints_from_gd/gmm_final.pth',
-                  tom_checkpoint_path='./../checkpoints_from_gd/tom_final.pth')
+    pose_map_corect = torch.zeros((18, 256, 192)) - 1 
+    pose_map_corect[0] = pose_map[0]
+    pose_map_corect[1] = pose_map[17]
+    pose_map_corect[2] = pose_map[6]
+    pose_map_corect[3] = pose_map[8]
+    pose_map_corect[4] = pose_map[10]
+    pose_map_corect[5] = pose_map[5]
+    pose_map_corect[6] = pose_map[7]
+    pose_map_corect[7] = pose_map[9]
+    pose_map_corect[8] = pose_map[12]
+    pose_map_corect[11] = pose_map[11]
+    pose_map_corect[14] = pose_map[2]
+    pose_map_corect[15] = pose_map[1]
+    pose_map_corect[16] = pose_map[4]
+    pose_map_corect[17] = pose_map[3]
+    pose_map = torch.tensor(pose_map_corect).type(torch.float32)
+
+
+    viton = Viton(gmm_checkpoint_path='./checkpoint/gmm_train_new/gmm_final.pth', 
+                tom_checkpoint_path='./checkpoint/tom_train_new/tom_final.pth')
+    shape = Image.open('./datasets/data/train/cloth/000003_1.jpg') # path to cloth
+    shape = transform_1d(shape)
     res = viton.run_viton(head, pose_map, shape, cloth, cloth_mask)
 
     img_array[np.array(body) == -1] = 0
@@ -79,7 +90,6 @@ def decode(byte64_str):
 
 
 def encode(img):
-    cv2.imwrite('bb.jpg', img[:, :, ::-1])
     pil_img = Image.fromarray(img.astype('uint8'))
     pil_img = pil_img.convert('RGB')
     buff = BytesIO()
@@ -105,7 +115,7 @@ def predict():
 
         img = decode(file)
         res = pipeline(img, c, cm)
-    return res
+    return encode(np.array(res[0].cpu().detach()).transpose(1,2,0) * 255)
 
 
 if __name__ == '__main__':

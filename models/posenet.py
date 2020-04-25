@@ -72,6 +72,7 @@ class DensePosePredictor:
                 x_start, y_start, x_end, y_end = int(x_start), int(y_start), int(x_end), int(y_end)
                 head = cv2.resize(head, dsize=(x_end - x_start, y_end - y_start), interpolation=cv2.INTER_CUBIC)
                 body = cv2.resize(body, dsize=(x_end - x_start, y_end - y_start), interpolation=cv2.INTER_CUBIC)
+<<<<<<< HEAD
 
                 head = np.concatenate((np.zeros((y_start, x_end - x_start)), head), axis=0)
                 head = np.concatenate((head, np.zeros((max(image.shape[0] - y_end, 0), x_end - x_start))), axis=0)
@@ -79,12 +80,25 @@ class DensePosePredictor:
                 head = np.concatenate((head, np.zeros((image.shape[0], max(image.shape[1] - x_end, 0)))), axis=1)
                 head = cv2.resize(head, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
 
+=======
+                # body resize
+>>>>>>> 83ba42a1350d845df5417beae79936a4b4aa9831
                 body = np.concatenate((np.zeros((y_start, x_end - x_start)), body), axis=0)
                 body = np.concatenate((body, np.zeros((max(image.shape[0] - y_end, 0), x_end - x_start))), axis=0)
                 body = np.concatenate((np.zeros((image.shape[0], x_start)), body), axis=1)
                 body = np.concatenate((body, np.zeros((image.shape[0], max(image.shape[1] - x_end, 0)))), axis=1)
                 body = cv2.resize(body, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
+<<<<<<< HEAD
                 body[head == 1] = 0
+=======
+                # head resize
+                head = np.concatenate((np.zeros((y_start, x_end - x_start)), head), axis=0)
+                head = np.concatenate((head, np.zeros((max(image.shape[0] - y_end, 0), x_end - x_start))), axis=0)
+                head = np.concatenate((np.zeros((image.shape[0], x_start)), head), axis=1)
+                head = np.concatenate((head, np.zeros((image.shape[0], max(image.shape[1] - x_end, 0)))), axis=1)
+                head = cv2.resize(head, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
+
+>>>>>>> 83ba42a1350d845df5417beae79936a4b4aa9831
                 return head, body
 
         return None, None
