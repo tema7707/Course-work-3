@@ -20,18 +20,18 @@ public class ModelsListActivity extends AbstractListActivity {
 
     first_item.setOnClickListener(v -> {
       final Intent intent = new Intent(ModelsListActivity.this, ImageSendingActivity.class);
-      intent.putExtra(Intent.EXTRA_REFERRER, "https://329df29d.ngrok.io/style/api/v1.0/pose");
+      intent.putExtra(Intent.EXTRA_REFERRER, "https://f88a78e0.ngrok.io/style/api/v1.0/pose");
       startActivity(intent);
     });
     second_item.setOnClickListener(v -> {
       final Intent intent = new Intent(ModelsListActivity.this, ImageSendingActivity.class);
-      intent.putExtra(Intent.EXTRA_REFERRER, "https://329df29d.ngrok.io/style/api/v1.0/tshirt");
+      intent.putExtra(Intent.EXTRA_REFERRER, "https://f88a78e0.ngrok.io/style/api/v1.0/tshirt");
       intent.putExtra("grub", 0);
       startActivity(intent);
      });
     third_item.setOnClickListener(v -> {
       final Intent intent = new Intent(ModelsListActivity.this, ImageSendingActivity.class);
-      intent.putExtra(Intent.EXTRA_REFERRER, "https://329df29d.ngrok.io/style/api/v1.0/tshirt");
+      intent.putExtra(Intent.EXTRA_REFERRER, "https://f88a78e0.ngrok.io/style/api/v1.0/tshirt");
       intent.putExtra("grub", 1);
       startActivity(intent);
     });

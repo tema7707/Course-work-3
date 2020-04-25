@@ -12,6 +12,7 @@ from torch.nn import init
 from torchvision import models
 from network_utils.network_utils import CPDataset, CPDataLoader
 import os
+import cv2
 import time
 import easydict
 import numpy as np
@@ -516,7 +517,9 @@ class Viton():
         grid, _ = self.gmm(agnostic[None,:,:,:], c[None,:,:,:])
         warped_cloth = F.grid_sample(c[None,:,:,:], grid, padding_mode='border')
         warped_mask = F.grid_sample(cm[None,:,:,:], grid, padding_mode='zeros')
-        
+        cv2.imwrite("wraped_cloth.jpg", warped_cloth[0][0].cpu().detach().numpy() * 255)
+        cv2.imwrite("mask_cloth.jpg", warped_mask[0][0].cpu().detach().numpy() * 255)
+
         return warped_cloth, warped_mask*2-1
 
     

@@ -66,9 +66,25 @@ class DensePosePredictor:
                 # generate masks of body and head
                 body[matrix != 0] = 1
                 head[matrix > 22] = 1
-                # resize from 255*255 back to image size
+
+                # resize from 112*112 back to image size
+                x_start, y_start, x_end, y_end = bboxes_xywh[n].tensor[0][:]
+                x_start, y_start, x_end, y_end = int(x_start), int(y_start), int(x_end), int(y_end)
+                head = cv2.resize(head, dsize=(x_end - x_start, y_end - y_start), interpolation=cv2.INTER_CUBIC)
+                body = cv2.resize(body, dsize=(x_end - x_start, y_end - y_start), interpolation=cv2.INTER_CUBIC)
+
+                head = np.concatenate((np.zeros((y_start, x_end - x_start)), head), axis=0)
+                head = np.concatenate((head, np.zeros((max(image.shape[0] - y_end, 0), x_end - x_start))), axis=0)
+                head = np.concatenate((np.zeros((image.shape[0], x_start)), head), axis=1)
+                head = np.concatenate((head, np.zeros((image.shape[0], max(image.shape[1] - x_end, 0)))), axis=1)
                 head = cv2.resize(head, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
+
+                body = np.concatenate((np.zeros((y_start, x_end - x_start)), body), axis=0)
+                body = np.concatenate((body, np.zeros((max(image.shape[0] - y_end, 0), x_end - x_start))), axis=0)
+                body = np.concatenate((np.zeros((image.shape[0], x_start)), body), axis=1)
+                body = np.concatenate((body, np.zeros((image.shape[0], max(image.shape[1] - x_end, 0)))), axis=1)
                 body = cv2.resize(body, dsize=(image.shape[1], image.shape[0]), interpolation=cv2.INTER_CUBIC)
+                body[head == 1] = 0
                 return head, body
 
         return None, None

@@ -30,7 +30,7 @@ public class ImageSendingActivity extends AppCompatActivity {
     final static private String TAG = "DetectronClassification";
     final static private int GALLERY_REQUEST_CODE = 20;
 
-    final static private String HOST = "https://329df29d.ngrok.io/style/api/v1.0/segmentate";
+    final static private String HOST = "https://f88a78e0.ngrok.io/style/api/v1.0/segmentate";
     final static private String KEY_FILE = "file";
     final static private String KEY_TYPE = "cloth";
     final static private String KEY_GRUB = "grub_cut";
@@ -59,7 +59,7 @@ public class ImageSendingActivity extends AppCompatActivity {
         });
     }
 
-    public void onActivityResult(int requestCode,int resultCode,Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == GALLERY_REQUEST_CODE) {
