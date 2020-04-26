@@ -4,8 +4,6 @@ App for virtual fitting of clothing fitting.
 ## Main functionality:
 This app is designed to show you how you will look in your chosen clothes.
 
-[Demonstration](https://drive.google.com/file/d/15Cb37ovY1rqtocVPbV_EHjqrzC_HdXBi/view?usp=sharing)
-
 | Clothes\Persons | ![Person1](./images/1/original.jpg) | ![Person2](./images/2/original.jpg) | ![Person3](./images/3/original.jpg) | ![Person4](./images/4/original.jpg) |
 |---|---|---|---|---|
 | ![Cloth1](./images/clothes/0.jpg) | ![Person1_0](./images/1/vans.jpg) | ![Person2_0](./images/2/vans.jpg) | ![Person3_0](./images/3/vans.jpg) | ![Person4_0](./images/4/vans.jpg) |
